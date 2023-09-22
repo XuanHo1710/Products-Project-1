@@ -30,22 +30,32 @@ module.exports.index = async (req, res) => {
     req.query,
     countProducts
   );
-  // End Pagination
 
+  // Sort
+  let sort = {};
+
+  if(req.query.sortKey && req.query.sortValue) {
+    sort[req.query.sortKey] = req.query.sortValue;
+  } else {
+    sort.position = "desc";
+  }
+ // End Sort
+  
 
   const products = await Product.find(find)
+  .sort(sort)
   .limit(objectPagination.limitItems)
-  .skip(objectPagination.skip)
-  .sort({ position: "desc" });
+  .skip(objectPagination.skip);
   
   res.render("admin/pages/products/index", {
-        titlePage: "Danh sách sản phẩm",  
-        products: products,
-        filterStatus: filterStatus,
-        keyword: objectSearch.keyword,
-        pagination: objectPagination  
+    titlePage: "Danh sách sản phẩm",  
+    products: products,
+    filterStatus: filterStatus,
+    keyword: objectSearch.keyword,
+    pagination: objectPagination  
   });
 };
+// End Pagination
 
 // [PATCH] /admin/products/change-status/:status/:id
 module.exports.changeStatus = async (req, res) => {

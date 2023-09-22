@@ -187,3 +187,45 @@ if(uploadImage) {
   })
 }
 // End Upload Image
+
+
+//Sort
+
+const sort = document.querySelector("[sort]");
+if(sort){
+  const sortSelect = sort.querySelector("[sort-select]");
+  const sortClear = sort.querySelector("[sort-clear]");
+  const url = new URL(window.location.href);
+
+  // Sort Select
+  sortSelect.addEventListener('change', (e) => {
+    const [sortKey, sortValue] = e.target.value.split('-');
+    url.searchParams.set('sortKey', sortKey);
+    url.searchParams.set('sortValue', sortValue);
+    window.location.href = url.href;
+  });
+  // End Sort Select
+
+  //Clear Sort
+  sortClear.addEventListener('click', (e) => {
+    url.searchParams.delete('sortKey');
+    url.searchParams.delete('sortValue');
+    window.location.href = url.href;
+  });
+  //End Clear Sort
+
+  // Add select for option
+  const sortKey = url.searchParams.get('sortKey');
+  const sortValue = url.searchParams.get('sortValue');
+  const selectValue = `${sortKey}-${sortValue}`;
+  
+  if(sortKey && sortValue){
+      const optionSelect = document.querySelector(`option[value=${selectValue}]`);
+      optionSelect.selected = true;
+  }
+  //End add select for option
+}
+
+
+
+//End Sort
