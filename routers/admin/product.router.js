@@ -21,7 +21,7 @@ router.post(
             upload.single("thumbnail"),
             validate.createPost, 
             productsController.createPost
-            );
+  );
 
 router.get("/edit/:id", productsController.edit);
 router.patch(

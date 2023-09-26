@@ -2,6 +2,7 @@ const ProductCategory = require("../../models/product-category.model");
 const filterStatusHelper = require("../../helper/filterStatus");
 const searchHelper = require('../../helper/search');
 const systemConfig = require("../../config/system");
+const createTreeHelper = require("../../helper/createTree");
 
 // [GET] /admin/products-category
 module.exports.index = async (req, res) => {
@@ -34,9 +35,11 @@ module.exports.index = async (req, res) => {
 
   const records = await ProductCategory.find(find).sort(sort);
 
+  const newRecords = createTreeHelper.createTree(records);
+
   res.render("admin/pages/products-category/index", {
     titlePage: "Danh mục sản phẩm",
-    records: records,
+    records: newRecords,
     filterStatus: filterStatus,
     objectSearch: objectSearch
   });
@@ -44,8 +47,18 @@ module.exports.index = async (req, res) => {
 
 // [GET] /admin/products-category/create
 module.exports.create = async (req, res) => {
+  let find = {
+    deleted: false
+  };
+  const records = await ProductCategory.find(find);
+
+  //Create Tree 
+  const newRecords = createTreeHelper.createTree(records);
+  //End Create Tree
+
   res.render("admin/pages/products-category/create", {
     titlePage: "Tạo danh mục sản phẩm",
+    records: newRecords
   });
 };
 
@@ -57,6 +70,7 @@ module.exports.createPost = async (req, res) => {
   } else {
     req.body.position = parseInt(req.body.position);
   }
+
 
   if(req.file)
     req.body.thumbnail = `/uploads/${req.file.filename}`;
