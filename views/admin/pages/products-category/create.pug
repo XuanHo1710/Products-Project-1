@@ -24,8 +24,9 @@ block main
                 id="parent_id"
                 class="form-control"
                 )
-                option(value="") -- Chọn thẻ cha --
-                +select-tree(records)     
+                option(value="") -- Chọn danh mục cha --
+                if(records)
+                    +select-tree(records)    
         div(class="form-group")
             label(for="desc") Mô tả
             textarea(
