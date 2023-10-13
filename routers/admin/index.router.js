@@ -5,12 +5,21 @@ const productCategoryRoutes = require("./product-category.route");
 const roleRoutes = require("./role.router");
 const accountRoutes = require("./account.route");
 const authRoutes = require("./auth.route");
+const authMiddleware = require("../../middlewares/admin/auth.middleware");
+
+const myAccountRoutes = require("./my-account.route");
+
 
 module.exports = (app) => {
-    app.use(PATHAdmin.prefixAdmin + "/products", productsRouter);
-    app.use(PATHAdmin.prefixAdmin + "/dashboard", dashboardRouter);
-    app.use(PATHAdmin.prefixAdmin + "/products-category", productCategoryRoutes);
-    app.use(PATHAdmin.prefixAdmin + "/roles", roleRoutes);
-    app.use(PATHAdmin.prefixAdmin + "/accounts", accountRoutes);
+    app.use(PATHAdmin.prefixAdmin + "/products",authMiddleware.requireAuth, productsRouter);
+    app.use(
+        PATHAdmin.prefixAdmin + "/dashboard",
+        authMiddleware.requireAuth,
+        dashboardRouter
+    );
+    app.use(PATHAdmin.prefixAdmin + "/products-category", authMiddleware.requireAuth, productCategoryRoutes);
+    app.use(PATHAdmin.prefixAdmin + "/roles", authMiddleware.requireAuth, roleRoutes);
+    app.use(PATHAdmin.prefixAdmin + "/accounts", authMiddleware.requireAuth, accountRoutes);
     app.use(PATHAdmin.prefixAdmin + "/auth", authRoutes);
+    app.use(PATHAdmin.prefixAdmin + "/my-account", authMiddleware.requireAuth, myAccountRoutes);
 }

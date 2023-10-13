@@ -6,7 +6,6 @@ module.exports.index = async (req, res) => {
     deleted: false
   }).sort({ position: "desc" });
   
-  console.log("OK")
 
 
   const newProducts = products.map(item => {

@@ -6,6 +6,8 @@ const systemConfig = require("../../config/system");
 const ProductCategory = require("../../models/product-category.model");
 const createTreeHelper = require("../../helper/createTree");
 
+const Account = require("../../models/account.model");
+
 
 module.exports.index = async (req, res) => {
   let find = {
@@ -45,10 +47,33 @@ module.exports.index = async (req, res) => {
   }
   // End Sort
 
+
   const products = await Product.find(find)
   .sort(sort)
   .limit(objectPagination.limitItems)
   .skip(objectPagination.skip);
+
+  // Lấy ra thông tin người tạo
+  for (const product of products) {
+    const user = await Account.findOne({
+      _id: product.createdBy.account_id
+    });
+
+    if(user) {
+      product.accountFullName = user.fullName;
+    }
+    // Lấy ra thông tin người cập nhật gần nhất
+    const updatedBy = product.updatedBy.slice(-1)[0];
+    if(updatedBy) {
+      const userUpdated = await Account.findOne({
+        _id: updatedBy.account_id
+      });
+  
+      updatedBy.accountFullName = userUpdated.fullName;
+    }
+  }
+  
+
   
   res.render("admin/pages/products/index", {
     titlePage: "Danh sách sản phẩm",  
@@ -64,7 +89,15 @@ module.exports.index = async (req, res) => {
 module.exports.changeStatus = async (req, res) => {
   const status = req.params.status;
   const id = req.params.id;
-  await Product.updateOne({ _id: id }, { status: status });
+  const updatedBy = {
+    account_id: res.locals.user.id,
+    updatedAt: new Date()
+  }
+
+  await Product.updateOne({ _id: id }, {
+    status: status,
+    $push: { updatedBy: updatedBy }
+  });
   req.flash("success", "Cập nhật trạng thái thành công!");
     res.redirect("back");
 };
@@ -74,13 +107,24 @@ module.exports.changeMulti = async (req, res) => {
   const type = req.body.type;
   const ids = req.body.ids.split(", ");
 
+  const updatedBy = {
+    account_id: res.locals.user.id,
+    updatedAt: new Date()
+  }
+
   switch (type) {
     case "active":
-      await Product.updateMany({ _id: { $in: ids } }, { status: "active" });
+      await Product.updateMany({ _id: { $in: ids } }, {
+        status: "active",
+        $push: { updatedBy: updatedBy }
+      });
       req.flash("success", `Cập nhật trạng thái thành công ${ids.length} sản phẩm!`);
       break;
     case "inactive":
-      await Product.updateMany({ _id: { $in: ids } }, { status: "inactive" });
+      await Product.updateMany({ _id: { $in: ids } }, {
+        status: "inactive",
+        $push: { updatedBy: updatedBy }
+      });
       req.flash("success", `Cập nhật trạng thái thành công ${ids.length} sản phẩm!`);
       break;
     case "delete-all":
@@ -88,7 +132,10 @@ module.exports.changeMulti = async (req, res) => {
         { _id: { $in: ids } },
         {
           deleted: true,
-          deletedAt: new Date(),
+          deletedBy: {
+            account_id: res.locals.user.id,
+            deletedAt: new Date(),
+          }
         }
       );
       req.flash("success", `Đã xóa thành công ${ids.length} sản phẩm!`);
@@ -118,7 +165,10 @@ module.exports.deleteItem = async (req, res) => {
       {_id: id},
       { 
         deleted: true,
-        deletedAt: new Date()
+        deletedBy: {
+          account_id: res.locals.user.id,
+          deletedAt: new Date(),
+        }
       }
       );
     req.flash("success", `Đã xóa thành công sản phẩm!`);
@@ -155,6 +205,11 @@ module.exports.createPost = async (req, res) => {
     
   if(req.file)
     req.body.thumbnail = `/uploads/${req.file.filename}`;
+
+  req.body.createdBy = {
+    account_id: res.locals.user.id
+  };
+  
   
   const product = new Product(req.body);
   await product.save();
@@ -205,7 +260,15 @@ module.exports.editPatch = async (req, res) => {
   }
 
   try {
-    await Product.updateOne({ _id: id }, req.body);
+    const updatedBy = {
+      account_id: res.locals.user.id,
+      updatedAt: new Date()
+    }
+
+    await Product.updateOne({ _id: id }, {
+      ...req.body,
+      $push: { updatedBy: updatedBy }
+    });
     req.flash("success", `Cập nhật thành công!`);
   } catch (error) {
     req.flash("error", `Cập nhật thất bại!`);

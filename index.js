@@ -12,6 +12,8 @@ const app = express();
 const post = process.env.PORT;
 app.use(methodOverride("_method"));
 
+const moment = require("moment");
+
 const router = require('./routers/client/index.router');
 const routerAdmin = require('./routers/admin/index.router');
 const mongoose = require('./config/database');
@@ -25,6 +27,7 @@ app.use(express.static(`${__dirname}/public`));
 
 // App Locals Variables
 app.locals.prefixAdmin = systemConfig.prefixAdmin;
+app.locals.moment = moment;
 
 // TinyMCE
 app.use(
