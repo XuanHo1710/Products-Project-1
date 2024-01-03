@@ -2,9 +2,9 @@ const express = require("express");
 const router = express.Router();
 
 const multer = require("multer");
-const storageMulter = require("../../helper/storageMulter");
-const upload = multer({ storage: storageMulter() });
+const upload = multer();
 
+const uploadCloud = require("../../middlewares/admin/uploadCloud.middleware");
 
 const controller = require("../../controller/admin/my-account.controller");
 
@@ -16,6 +16,7 @@ router.get("/edit", controller.edit);
 router.patch(
   "/edit",
   upload.single("avatar"),
+  uploadCloud.upload,
   controller.editPatch
 );
 

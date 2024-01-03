@@ -34,8 +34,6 @@ module.exports.editPatch = async (req, res) => {
       delete req.body.password;
     }
 
-    if(req.file)
-        req.body.avatar = `/uploads/${req.file.filename}`;
 
     await Account.updateOne({ _id: id }, req.body);
 

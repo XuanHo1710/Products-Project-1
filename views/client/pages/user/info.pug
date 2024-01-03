@@ -1,0 +1,18 @@
+extends ../../layout/default.pug
+include ../../mixins/box-head.pug
+include ../../../admin/mixins/moment.pug
+
+block main
+  .container.my-3
+    .row
+      .col-12
+        +box-head("Thông tin tài khoản")
+
+    if (user.fullName)
+      h3(class="mb-4") Họ và tên:  #{user.fullName}
+
+    if (user.email)
+      h3(class="mb-4") Email:  #{user.email}
+    if(user.createdAt)
+      h3(class="mb-4") Ngày khởi tạo: 
+        +formatDate(user.createdAt)

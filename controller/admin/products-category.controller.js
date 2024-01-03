@@ -72,8 +72,6 @@ module.exports.createPost = async (req, res) => {
   }
 
 
-  if(req.file)
-    req.body.thumbnail = `/uploads/${req.file.filename}`;
 
   const record = new ProductCategory(req.body);
   await record.save();

@@ -2,12 +2,14 @@ include ../mixins/sub-menu.pug
 header.header
   .container
     .row.align-items-center
-      .col-3
+      .col-2
         .inner-logo
           a(href="/")
-            img(src="/img/logo.svg", alt="Logo")
-
-      .col-5
+            img(
+              src=settingGeneral ? settingGeneral.logo : "",
+              alt=settingGeneral ? settingGeneral.websiteName : ""
+              )
+      .col-4
         form(
           action="/search"
           method="GET"
@@ -25,7 +27,7 @@ header.header
               class="btn btn-primary"
             ) Tìm
 
-      .col-4
+      .col-6
         .inner-menu
           ul
             li
@@ -36,3 +38,15 @@ header.header
                 +sub-menu(layoutProductsCategory, pathProduct)
             li
               a(href="/cart") Giỏ hàng (#{miniCart ? miniCart.totalQuantity : 0})
+            if(user)
+              li
+                a(href="/chat") Chat
+              li
+                a(href="/user/info") #{user.fullName}
+              li
+                a(href="/user/logout") Đăng xuất
+            else   
+              li
+                a(href="/user/login") Đăng nhập
+              li
+                a(href="/user/register") Đăng ký

@@ -5,7 +5,11 @@ const systemConfig = require("../../config/system");
 
 module.exports.requireAuth = async (req, res, next) => {
   if(!req.cookies.token) {
-    res.redirect(`${systemConfig.prefixAdmin}/auth/login`).select("-password");
+    res.redirect(`${systemConfig.prefixAdmin}/auth/login`);
+
+    //.select("-password"); Nó ko hiểu cái này !!!
+
+    
   } else {
     const user = await Account.findOne({ token: req.cookies.token });
     if(!user) {
